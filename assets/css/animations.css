@@ -1,0 +1,282 @@
+/* PHM Edge系統儀表板 - 動畫效果 */
+
+/* ----- 基本過渡效果 ----- */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 卡片淡入效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.machine-card {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* 為卡片設置不同的延遲，產生疊加效果 */
+.machine-grid .machine-card:nth-child(1) { animation-delay: 0.05s; }
+.machine-grid .machine-card:nth-child(2) { animation-delay: 0.1s; }
+.machine-grid .machine-card:nth-child(3) { animation-delay: 0.15s; }
+.machine-grid .machine-card:nth-child(4) { animation-delay: 0.2s; }
+.machine-grid .machine-card:nth-child(5) { animation-delay: 0.25s; }
+.machine-grid .machine-card:nth-child(6) { animation-delay: 0.3s; }
+
+/* ----- 數據更新動畫 ----- */
+/* 數值變化時的過渡效果 */
+.gauge-value, .rul-info strong, .parameter-value, .info-value {
+  transition: all 0.8s ease;
+}
+
+/* 數值脈動效果 */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.value-updated {
+  animation: pulse 0.6s ease;
+}
+
+/* ----- 警報與通知動畫 ----- */
+/* 新警報淡入效果 */
+@keyframes alertFadeIn {
+  from {
+    opacity: 0;
+    background-color: rgba(239, 68, 68, 0.2);
+  }
+  to {
+    opacity: 1;
+    background-color: transparent;
+  }
+}
+
+.new-alert {
+  animation: alertFadeIn 1.5s ease forwards;
+}
+
+/* 高優先級警報的閃爍效果 */
+@keyframes highPriorityBlink {
+  0% {
+    background-color: rgba(239, 68, 68, 0.05);
+  }
+  50% {
+    background-color: rgba(239, 68, 68, 0.15);
+  }
+  100% {
+    background-color: rgba(239, 68, 68, 0.05);
+  }
+}
+
+.alerts-table tr.priority-high {
+  animation: highPriorityBlink 2s infinite;
+}
+
+/* ----- 狀態指示動畫 ----- */
+/* 危險狀態脈動效果 */
+@keyframes dangerPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 5px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.machine-card.danger .status-danger {
+  animation: dangerPulse 2s infinite;
+}
+
+/* 警告狀態呼吸效果 */
+@keyframes warningBreath {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.8;
+  }
+}
+
+.machine-card.warning .status-warning {
+  animation: warningBreath 3s infinite;
+}
+
+/* ----- 載入與刷新動畫 ----- */
+/* 刷新按鈕旋轉動畫 */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.refresh-btn.loading .icon {
+  display: inline-block;
+  animation: rotate 1s linear infinite;
+}
+
+/* 資料載入中動畫 */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 50;
+  backdrop-filter: blur(2px);
+}
+
+@keyframes dotPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+.loading-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.loading-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  animation: dotPulse 1.4s infinite;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* ----- 頁面轉場動畫 ----- */
+/* 視圖切換動畫 */
+.view-enter-active,
+.view-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.view-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.view-leave-to {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* ----- 圖表動畫 ----- */
+/* 圖表顯示動畫 */
+@keyframes chartGrow {
+  from {
+    opacity: 0;
+    transform: scaleY(0.9);
+    transform-origin: bottom;
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+}
+
+.health-index-chart,
+.rul-chart,
+.global-health-chart,
+.status-pie-chart,
+.trend-chart {
+  animation: chartGrow 1s ease forwards;
+}
+
+/* ----- 其他交互動畫 ----- */
+/* 按鈕懸停效果 */
+.back-btn,
+.refresh-btn,
+.main-nav button,
+.time-control select {
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover,
+.refresh-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* 參數卡片懸停效果 */
+.parameter-item {
+  transition: transform 0.2s ease;
+}
+
+.parameter-item:hover {
+  transform: translateY(-3px);
+}
+
+/* 視圖轉場動畫 */
+.overview-view,
+.detail-view {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* 資料更新動畫 */
+@keyframes dataUpdate {
+  0% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.data-updated {
+  animation: dataUpdate 0.8s ease;
+}
