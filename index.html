@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHM Edge系統儀表板</title>
+    <!-- 引入CSS -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+    <!-- 引入第三方庫 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.2.31/dist/vue.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.3.2/dist/echarts.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 頂部導航欄 -->
+        <header class="main-header">
+            <div class="logo">
+                <h1>PHM Edge系統儀表板</h1>
+            </div>
+            <nav class="main-nav">
+                <button @click="currentView = 'overview'" :class="{ active: currentView === 'overview' }">總覽視圖</button>
+                <button @click="currentView = 'detail'" :class="{ active: currentView === 'detail' }" :disabled="!selectedMachine">詳細視圖</button>
+            </nav>
+            <div class="time-control">
+                <span>時間範圍：</span>
+                <select v-model="timeRange">
+                    <option value="day">24小時</option>
+                    <option value="week">7天</option>
+                    <option value="month">30天</option>
+                </select>
+                <button class="refresh-btn" @click="refreshData">
+                    <span class="icon">↻</span> 刷新數據
+                </button>
+            </div>
+        </header>
+
+        <!-- 主內容區域 -->
+        <main class="main-content">
+            <!-- 總覽視圖 -->
+            <section v-if="currentView === 'overview'" class="overview-view">
+                <!-- 機台狀態總覽 -->
+                <div class="panel machine-status-panel">
+                    <h2 class="panel-title">機台狀態總覽</h2>
+                    <div class="machine-grid">
+                        <div v-for="machine in machines" :key="machine.id"
+                             class="machine-card"
+                             :class="machine.status"
+                             @click="selectMachine(machine)">
+                            <div class="machine-header">
+                                <h3>{{ machine.name }}</h3>
+                                <span class="machine-id">ID: {{ machine.id }}</span>
+                            </div>
+                            <div class="machine-body">
+                                <div class="machine-info">
+                                    <p>型號: {{ machine.model }}</p>
+                                    <p>位置: {{ machine.location }}</p>
+                                </div>
+                                <div class="machine-health">
+                                    <div class="health-gauge">
+                                        <div class="gauge-chart" :id="'gauge-' + machine.id"></div>
+                                        <div class="gauge-value">{{ (machine.healthIndex * 100).toFixed(0) }}%</div>
+                                    </div>
+                                    <div class="rul-info">
+                                        <span>剩餘壽命:</span>
+                                        <strong>{{ machine.rul.value }} {{ machine.rul.unit }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="machine-status-indicator">
+                                <span :class="'status-' + machine.status">
+                                    {{ getStatusText(machine.status) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 關鍵指標摘要 -->
+                <div class="panel key-metrics-panel">
+                    <h2 class="panel-title">關鍵指標摘要</h2>
+                    <div class="metrics-container">
+                        <div class="metric-card">
+                            <h3>全局健康指數</h3>
+                            <div class="global-health-chart" id="globalHealthChart"></div>
+                        </div>
+                        <div class="metric-card">
+                            <h3>機台狀態分布</h3>
+                            <div class="status-pie-chart" id="statusPieChart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 警報與通知 -->
+                <div class="panel alerts-panel">
+                    <h2 class="panel-title">警報與通知</h2>
+                    <div class="alerts-container">
+                        <table class="alerts-table">
+                            <thead>
+                                <tr>
+                                    <th>機台ID</th>
+                                    <th>警報類型</th>
+                                    <th>詳情</th>
+                                    <th>時間</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(alert, index) in alerts" :key="index" :class="'priority-' + alert.priority">
+                                    <td>{{ alert.machineId }}</td>
+                                    <td>{{ alert.type }}</td>
+                                    <td>{{ alert.message }}</td>
+                                    <td>{{ alert.time }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 詳細視圖 -->
+            <section v-if="currentView === 'detail' && selectedMachine" class="detail-view">
+                <!-- 返回按鈕 -->
+                <div class="detail-nav">
+                    <button class="back-btn" @click="currentView = 'overview'">
+                        ← 返回總覽
+                    </button>
+                    <h2>{{ selectedMachine.name }} 詳細資訊</h2>
+                </div>
+
+                <!-- 機台基本資訊 -->
+                <div class="panel machine-info-panel">
+                    <h2 class="panel-title">機台基本資訊</h2>
+                    <div class="machine-info-grid">
+                        <div class="info-item">
+                            <span class="info-label">ID:</span>
+                            <span class="info-value">{{ selectedMachine.id }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">型號:</span>
+                            <span class="info-value">{{ selectedMachine.model }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">位置:</span>
+                            <span class="info-value">{{ selectedMachine.location }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">狀態:</span>
+                            <span class="info-value" :class="'status-' + selectedMachine.status">
+                                {{ getStatusText(selectedMachine.status) }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 健康狀態詳細 -->
+                <div class="panel health-detail-panel">
+                    <h2 class="panel-title">健康狀態詳細</h2>
+                    <div class="health-detail-grid">
+                        <div class="health-card">
+                            <h3>當前健康指數(HI)</h3>
+                            <div class="health-index-chart" id="detailHealthChart"></div>
+                        </div>
+                        <div class="health-card">
+                            <h3>剩餘使用壽命(RUL)</h3>
+                            <div class="rul-chart" id="detailRulChart"></div>
+                        </div>
+                        <div class="health-card parameters-card">
+                            <h3>關鍵參數</h3>
+                            <div class="parameters-grid">
+                                <div class="parameter-item">
+                                    <span class="parameter-name">溫度</span>
+                                    <div class="parameter-gauge" id="tempGauge"></div>
+                                    <span class="parameter-value">{{ selectedMachine.parameters.temperature }}°C</span>
+                                </div>
+                                <div class="parameter-item">
+                                    <span class="parameter-name">震動</span>
+                                    <div class="parameter-gauge" id="vibrationGauge"></div>
+                                    <span class="parameter-value">{{ selectedMachine.parameters.vibration }} g</span>
+                                </div>
+                                <div class="parameter-item">
+                                    <span class="parameter-name">壓力</span>
+                                    <div class="parameter-gauge" id="pressureGauge"></div>
+                                    <span class="parameter-value">{{ selectedMachine.parameters.pressure }} kPa</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 歷史趨勢與預測 -->
+                <div class="panel history-trend-panel">
+                    <h2 class="panel-title">歷史趨勢與預測</h2>
+                    <div class="chart-container">
+                        <div class="trend-chart" id="historyTrendChart"></div>
+                    </div>
+                    <div class="prediction-info">
+                        <h3>預測維護建議</h3>
+                        <p v-if="selectedMachine.status === 'normal'">
+                            根據當前趨勢，預計下次維護時間為：{{ getNextMaintenanceDate(selectedMachine.rul.value) }}
+                        </p>
+                        <p v-else-if="selectedMachine.status === 'warning'">
+                            <span class="warning-text">建議安排維護檢查，剩餘壽命低於預警閾值</span>
+                        </p>
+                        <p v-else>
+                            <span class="danger-text">需要立即維護，剩餘壽命嚴重不足！</span>
+                        </p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 頁腳 -->
+        <footer class="main-footer">
+            <div class="footer-info">
+                <p>PHM Edge系統儀表板 | 版本: 1.0.0 | 最後更新: {{ currentDate }}</p>
+            </div>
+            <div class="data-info">
+                <p>數據更新時間: {{ lastUpdated }}</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 引入JavaScript -->
+    <script src="assets/js/charts.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script src="assets/js/main.js"></script>
+</body>
+</html>

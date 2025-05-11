@@ -1,0 +1,541 @@
+/* PHM Edge系統儀表板 - 主要樣式 */
+
+/* ----- 基礎設置 ----- */
+:root {
+  /* 顏色變量 */
+  --primary-color: #1a56db;
+  --primary-light: #3b82f6;
+  --primary-dark: #1e429f;
+  --secondary-color: #475569;
+  --background-dark: #0f172a;
+  --background-light: #ffffff;
+  --background-panel: #f8fafc;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-light: #f8fafc;
+
+  /* 狀態顏色 */
+  --status-normal: #10b981;
+  --status-warning: #f59e0b;
+  --status-danger: #ef4444;
+
+  /* 間距 */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  /* 陰影 */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #f1f5f9;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* ----- 佈局 ----- */
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-header {
+  background-color: var(--background-dark);
+  color: var(--text-light);
+  padding: var(--spacing-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo h1 {
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.main-nav {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.main-nav button {
+  background-color: transparent;
+  color: var(--text-light);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.main-nav button:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.main-nav button.active {
+  background-color: var(--primary-color);
+}
+
+.main-nav button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.time-control {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.time-control select {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  border: 1px solid var(--primary-light);
+  background-color: var(--background-dark);
+  color: var(--text-light);
+}
+
+.refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.refresh-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+.main-content {
+  flex: 1;
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.main-footer {
+  background-color: var(--background-dark);
+  color: var(--text-light);
+  padding: var(--spacing-md);
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+}
+
+/* ----- 共用組件 ----- */
+.panel {
+  background-color: var(--background-panel);
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.panel-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid #e2e8f0;
+  color: var(--primary-dark);
+}
+
+/* ----- 總覽視圖 ----- */
+.overview-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.machine-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.machine-card {
+  background-color: var(--background-light);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-md);
+  border-left: 4px solid var(--status-normal);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.machine-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.machine-card.normal {
+  border-left-color: var(--status-normal);
+}
+
+.machine-card.warning {
+  border-left-color: var(--status-warning);
+}
+
+.machine-card.danger {
+  border-left-color: var(--status-danger);
+}
+
+.machine-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.machine-header h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.machine-id {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.machine-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.machine-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  font-size: 0.875rem;
+}
+
+.machine-health {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.health-gauge {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gauge-chart {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.gauge-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  z-index: 1;
+  color: var(--primary-dark);
+}
+
+.rul-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.rul-info span {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.rul-info strong {
+  font-size: 1.125rem;
+  color: var(--primary-dark);
+}
+
+.machine-status-indicator {
+  margin-top: var(--spacing-md);
+  text-align: right;
+}
+
+.status-normal,
+.status-warning,
+.status-danger {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status-normal {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: var(--status-normal);
+}
+
+.status-warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: var(--status-warning);
+}
+
+.status-danger {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--status-danger);
+}
+
+/* 關鍵指標摘要 */
+.metrics-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.metric-card {
+  background-color: var(--background-light);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.metric-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.global-health-chart,
+.status-pie-chart {
+  height: 250px;
+  width: 100%;
+}
+
+/* 警報表格 */
+.alerts-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.alerts-table th,
+.alerts-table td {
+  padding: var(--spacing-sm);
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.alerts-table th {
+  font-weight: 600;
+  background-color: #f1f5f9;
+  color: var(--text-secondary);
+}
+
+.alerts-table tr.priority-high {
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.alerts-table tr.priority-medium {
+  background-color: rgba(245, 158, 11, 0.05);
+}
+
+.alerts-table tr.priority-low {
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+/* ----- 詳細視圖 ----- */
+.detail-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.back-btn {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-weight: 500;
+}
+
+.back-btn:hover {
+  background-color: var(--primary-dark);
+}
+
+.detail-nav h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+/* 機台基本資訊 */
+.machine-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.info-label {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.info-value {
+  font-size: 1.125rem;
+  font-weight: 500;
+}
+
+/* 健康狀態詳細 */
+.health-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.health-card {
+  background-color: var(--background-light);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.health-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.health-index-chart,
+.rul-chart,
+.parameters-grid {
+  height: 250px;
+}
+
+.parameters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: var(--spacing-md);
+}
+
+.parameter-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.parameter-name {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+}
+
+.parameter-gauge {
+  width: 100%;
+  height: 150px;
+}
+
+.parameter-value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* 歷史趨勢圖 */
+.chart-container {
+  margin-bottom: var(--spacing-lg);
+}
+
+.trend-chart {
+  height: 350px;
+  width: 100%;
+}
+
+.prediction-info {
+  background-color: var(--background-light);
+  border-radius: 8px;
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.prediction-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
+.warning-text {
+  color: var(--status-warning);
+  font-weight: 600;
+}
+
+.danger-text {
+  color: var(--status-danger);
+  font-weight: 600;
+}
+
+/* ----- 響應式設計 ----- */
+@media screen and (max-width: 1200px) {
+  .machine-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .main-header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: stretch;
+  }
+
+  .time-control {
+    justify-content: space-between;
+  }
+
+  .machine-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .metrics-container,
+  .health-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .main-footer {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+  }
+}
